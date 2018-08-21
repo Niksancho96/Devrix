@@ -9,16 +9,17 @@
 	class Events extends CI_Model {
 
 		public function getEvents($case) {
+			$date = date('Y-m-d');
+
 			switch ($case) {
 				case 'today':
-					$date = date('Y-m-d');
 					$query = $this->db->query('SELECT * FROM events WHERE date LIKE "%' . $date . '%" ORDER BY id DESC LIMIT 3');
 					return $query->result_array();
 				break;
 
 				case 'old':
-					$date = date('Y-m-d H:i:s');
-					$query = $this->db->query('SELECT * FROM events WHERE date < "' . $date . '" ORDER BY id DESC LIMIT 3');
+					$now = date('Y-m-d H:i:s');
+					$query = $this->db->query('SELECT * FROM events WHERE date < "' . $now . '" AND date != "' . $date . '" ORDER BY id DESC LIMIT 3');
 					return $query->result_array();
 				break;
 
@@ -28,6 +29,26 @@
 					return $query->result_array();
 				break;
 			}
+		}
+
+		public function getAllTodayEvents($date) {
+			$query = $this->db->query('SELECT * FROM events WHERE date LIKE "%' . $date . '%" ORDER BY id DESC');
+			return $query->result_array();
+		}
+
+		public function getAllPassedEvents($date) {
+			$now = date('Y-m-d H:i:s');
+			$query = $this->db->query('SELECT * FROM events WHERE date < "' . $now . '" AND date != "' . $date . '" ORDER BY id DESC');
+			return $query->result_array();
+		}
+
+		public function getAllCommingEvents($date) {
+			$query = $this->db->query('SELECT * FROM events WHERE date > "' . $date . '" ORDER BY id DESC');
+			return $query->result_array();
+		}
+
+		public function addNewEvent($data) {
+			
 		}
 
 	}
