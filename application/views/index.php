@@ -15,7 +15,7 @@
 				<tr>
 					<td><?= $event['id'] ?></td>
 					<td><?= $event['name'] ?></td>
-					<td><?= $event['location'] ?></td>
+					<td><a href="welcome/googleMapsLink/<?= $event['location']['link'] ?>"><?= $event['location']['address'] ?></a></td>
 					<td><?= $event['date'] ?></td>
 					<td><a href="<?= $event['url'] ?>" target="_blank">Link</a></td>
 				</tr>

@@ -15,6 +15,10 @@ class Welcome extends CI_Controller {
 		$data['old']       = $this->events->getEvents('old');
 		$data['comming']   = $this->events->getEvents('comming');
 
+		$data['today']     = $this->addGoogleMapsLinkToArray($data['today']);
+		$data['old']     = $this->addGoogleMapsLinkToArray($data['old']);
+		$data['comming']     = $this->addGoogleMapsLinkToArray($data['comming']);
+
 		$this->parser->parse('partials/header', $data);
 		$this->load->view('partials/header', $data);
 		$this->load->view('index', $data);
@@ -78,7 +82,29 @@ class Welcome extends CI_Controller {
 		$this->load->view('partials/footer');
 	}
 
+	public function googleMapsLink($location) {
+		$url     = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+		$address = urlencode($location);
+		$request = file_get_contents($url . $address);
+		$result  = json_decode($request, true);
+		$lat     = $result['results'][0]['geometry']['location']['lat'];
+		$lon     = $result['results'][0]['geometry']['location']['lng'];
+
+		return 'https://www.google.com/maps/search/?api=1&query=' . $lat . ',' . $lon;
+	}
+
+	public function addGoogleMapsLinkToArray($array) {
+		foreach ($array as $element) {
+			$element['location'] = [
+				'address' => $element['location'],
+				'link'    => $this->googleMapsLink($element['location'])
+			];
+		}
+	}
+
 	public function test() {
-		echo '<pre>'; var_dump();
+		echo '<pre>';
+
+		var_dump($this->googleMapsLink('ж.к. Студентски град 4'));
 	}
 }
