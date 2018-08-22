@@ -48,7 +48,8 @@
 		}
 
 		public function addNewEvent($data) {
-			
+			$query = $this->db->query('INSERT INTO events SET id = NULL, name = "' . $data['name'] . '", location = "' . $data['location'] . '", date = "' . $data['date'] . '", url = "' . $data['url'] . '"');
+			return $query ? true : false;
 		}
 
 	}

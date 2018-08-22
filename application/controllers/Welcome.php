@@ -55,6 +55,22 @@ class Welcome extends CI_Controller {
 	}
 
 	public function create() {
+		if ($this->input->method(TRUE) == 'POST') {
+			$create = [
+				'name'     => $this->input->post('name'),
+				'location' => $this->input->post('location'),
+				'date'     => $this->input->post('date'),
+				'url'      => $this->input->post('url')
+			];
+
+			$creation = $this->events->addNewEvent($create);
+			if ($creation) {
+				$data['post_result'] = true;
+			} else {
+				$data['post_result'] = false;
+			}
+		}
+
 		$data['title'] = 'Event Lister - Create Event';
 		$this->parser->parse('partials/header', $data);
 		$this->load->view('partials/header', $data);
