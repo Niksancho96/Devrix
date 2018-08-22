@@ -1,3 +1,6 @@
+# Note before uploading project to test server
+Project is curently going in a test phase. There may be some problems with links & redirection. Depends on the local server set-up. If there are any issues - please contact me.
+
 # Contributing to CodeIgniter
 
 
