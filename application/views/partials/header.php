@@ -82,6 +82,10 @@
 			margin-top: 5px;
 			margin-left: -35px;
 		}
+
+		.add {
+			padding: 5px;
+		}
 	</style>
 </head>
 

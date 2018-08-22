@@ -53,7 +53,7 @@
 		</form>
 
 		<p class="footer">
-			<a class="btn btn-primary new" href="index"><i class="fa fa-arrow-circle-left"></i> Back</a>
+			<a class="btn btn-primary new" href="index.php/welcome/index"><i class="fa fa-arrow-circle-left"></i> Back</a>
 		</p>
 	</div>
 </div>

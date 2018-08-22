@@ -11,13 +11,9 @@ class Welcome extends CI_Controller {
 
 	public function index() {
 		$data['title']     = 'Event Lister - Index';
-		$data['today']     = $this->events->getEvents('today');
-		$data['old']       = $this->events->getEvents('old');
-		$data['comming']   = $this->events->getEvents('comming');
-
-		$data['today']     = $this->addGoogleMapsLinkToArray($data['today']);
-		$data['old']     = $this->addGoogleMapsLinkToArray($data['old']);
-		$data['comming']     = $this->addGoogleMapsLinkToArray($data['comming']);
+		$data['today']     = $this->addGoogleMapsLinkToArray($this->events->getEvents('today'));
+		$data['old']       = $this->addGoogleMapsLinkToArray($this->events->getEvents('old'));
+		$data['comming']   = $this->addGoogleMapsLinkToArray($this->events->getEvents('comming'));
 
 		$this->parser->parse('partials/header', $data);
 		$this->load->view('partials/header', $data);
@@ -28,7 +24,8 @@ class Welcome extends CI_Controller {
 	public function today() {
 		$date              = date('Y-m-d');
 		$data['title']     = 'Event Lister - Today\'s Events';
-		$data['today']     = $this->events->getAllTodayEvents($date);
+		$data['today']     = $this->addGoogleMapsLinkToArray($this->events->getAllTodayEvents($date));
+		$data['today']     = $this->addGoogleCalendarLinkToArray($data['today']);
 
 		$this->parser->parse('partials/header', $data);
 		$this->load->view('partials/header', $data);
@@ -39,7 +36,7 @@ class Welcome extends CI_Controller {
 	public function passed() {
 		$date              = date('Y-m-d');
 		$data['title']     = 'Event Lister - Passed Events';
-		$data['passed']     = $this->events->getAllPassedEvents($date);
+		$data['passed']    = $this->addGoogleMapsLinkToArray($this->events->getAllPassedEvents($date));
 
 		$this->parser->parse('partials/header', $data);
 		$this->load->view('partials/header', $data);
@@ -50,7 +47,8 @@ class Welcome extends CI_Controller {
 	public function comming() {
 		$date              = date('Y-m-d');
 		$data['title']     = 'Event Lister - Up Comming Events';
-		$data['comming']     = $this->events->getAllCommingEvents($date);
+		$data['comming']   = $this->addGoogleMapsLinkToArray($this->events->getAllCommingEvents($date));
+		$data['comming']   = $this->addGoogleCalendarLinkToArray($data['comming']);
 
 		$this->parser->parse('partials/header', $data);
 		$this->load->view('partials/header', $data);
@@ -83,28 +81,38 @@ class Welcome extends CI_Controller {
 	}
 
 	public function googleMapsLink($location) {
-		$url     = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
-		$address = urlencode($location);
-		$request = file_get_contents($url . $address);
-		$result  = json_decode($request, true);
-		$lat     = $result['results'][0]['geometry']['location']['lat'];
-		$lon     = $result['results'][0]['geometry']['location']['lng'];
-
-		return 'https://www.google.com/maps/search/?api=1&query=' . $lat . ',' . $lon;
+		$prepLocation = str_replace(' ', '+', $location);
+		return 'https://www.google.bg/maps/place/' . $prepLocation;
 	}
 
 	public function addGoogleMapsLinkToArray($array) {
-		foreach ($array as $element) {
+		foreach ($array as &$element) {
 			$element['location'] = [
 				'address' => $element['location'],
 				'link'    => $this->googleMapsLink($element['location'])
 			];
 		}
+
+		return $array;
 	}
 
-	public function test() {
-		echo '<pre>';
+	public function googleCalendarLink($name, $location, $startDate) {
+		$startDate = str_replace(' ', 'T', date('Ymd His', strtotime($startDate)));
+		$dates     = $startDate . 'Z/' . $startDate . 'Z';
 
-		var_dump($this->googleMapsLink('ж.к. Студентски град 4'));
+		$name      = $name ? str_replace(' ', '+', $name) : "";
+		$location  = $location ? str_replace(' ', '+', $location) : "";
+
+		$googleCalendarUrl = 'https://www.google.com/calendar/render?action=TEMPLATE&text=' . $name . '&dates=' . $dates . '&location=' . $location . '&sf=true&output=xml';
+
+		return $googleCalendarUrl;
+	}
+
+	public function addGoogleCalendarLinkToArray($array) {
+		foreach ($array as &$element) {
+			$element['google_calendar'] = $this->googleCalendarLink($element['name'], $element['location'], $element['date']);
+		}
+
+		return $array;
 	}
 }
